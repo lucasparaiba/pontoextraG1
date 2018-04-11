@@ -1,0 +1,188 @@
+<div class="container">
+    <h1>Ocorrencias</h1>
+    <hr>
+    <div *ngIf="excluir_ok" class="alert alert-success">
+        <strong>Sucesso!</strong> A ocorrência foi excluída com sucesso.
+    </div>
+    <table class="table table-hover table-bordered">
+        <thead class="thead-light">
+        <tr>
+            <th width="200">Data</th>
+            <th width="200">Matricula</th>
+            <th width="200">Nome</th>
+            <th width="200">Tipo</th>
+            <th width="200">Funções</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let ocorrencia of ocorrencias"
+            [class.table-active]="editando == ocorrencia">
+            <td>
+                <i *ngIf="editando == ocorrencia"
+                   class="fa fa-pencil-square"></i>
+                {{ocorrencia.data}}
+            </td>
+            <td>
+                <i *ngIf="editando == ocorrencia"
+                    class="fa fa-pencil-square"></i>    
+                {{ocorrencia.matricula}}
+            </td>
+            <td>
+                <i *ngIf="editando == ocorrencia"
+                    class="fa fa-pencil-square"></i>    
+                {{ocorrencia.nome_aluno}}
+            </td>
+            <td>
+                <i *ngIf="editando == ocorrencia"
+                    class="fa fa-pencil-square"></i>    
+                {{ocorrencia.tipo}}
+            </td>
+            <td>
+                <button class="btn btn-sm btn-danger"
+                        (click)="excluir(ocorrencia)">
+                    <i class="fa fa-trash"></i> Excluir
+                </button>
+                <button class="btn btn-sm btn-primary"
+                        (click)="editar(ocorrencia)">
+                    <i class="fa fa-pencil-square"></i> Editar
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <h1> Estatísticas</h1>
+    <p class="alert alert-info">Relatório estatístico relacionados as ocorrências cadastradas.
+        <button type="button" class="close btnExibir" data-dismiss="alert" (click)="exibir_estatisticas()">
+            <i class="fa fa-eye" *ngIf="!(exibir_ok)" title="exibir"></i>
+            <i class="fa fa-eye-slash" *ngIf="exibir_ok" title="ocultar"></i>
+        </button>
+    </p>
+    <table class="table table-sm table-hover table-bordered" *ngIf="exibir_ok">
+        <thead class="thead-light">
+        <tr>
+            <th>Tipo de ocorrência</th>
+            <th>(%) de ocorrências</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let tipo of tipos">
+            <td>{{tipo.nome}} </td>
+            <td>{{porcentagens[tipo.id]}}%</td>
+        </tr>
+        </tbody>
+        <thead class="thead-light">
+        <tr>
+            <th>Mês</th>
+            <th>Quantidade de ocorrências</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Março </td>
+            <td>{{cont_marco}}</td>
+        </tr>
+        <tr>
+            <td>Abril </td>
+            <td>{{cont_abril}}</td>
+        </tr>
+        </tbody>
+
+        <thead class="thead-light">
+        <tr>
+            <th> Relação mensal (mês anterior X mês atual )</th>
+            <th>(%) de ocorrências</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr [class.table-danger]="relacao_ocorrencias >=0 " [class.table-success]="relacao_ocorrencias < 0 " >
+            <td>março-abril </td>
+            <td>{{relacao_ocorrencias}}%</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table class="table table-sm table-bordered" *ngIf="exibir_ok">
+        <thead class="thead-dark">
+        <tr>
+            <th> Busca por intervalo de datas (DATA)</th>
+            <th>Formulário/Resultado</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Data inicial: </td>
+            <td> <input type="date" name="dataInicial" class="form-control" (change)="pesquisaIntervalos()" [(ngModel)]="dataInicial"></td>
+        </tr>
+        <tr *ngIf="dataInicial != null">
+            <td>Data final: </td>
+            <td> <input type="date" name="dataFinal" class="form-control" (change)="pesquisaIntervalos()" [(ngModel)]="dataFinal"></td>
+        </tr>
+        <tr *ngIf="dataFinal != null">
+            <td>Quantidade de ocorrências no intervalo: </td>
+            <td>{{qtdIntervalo}}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<form *ngIf="selecionado == true" #cadastro="ngForm" (submit)="salvar()">
+
+    <h2>Cadastrar</h2>
+    <p>Use este formulário para cadastrar ou editar uma Ocorrência.</p>
+    <div *ngIf="salvar_ok || editar_ok" class="alert alert-success">
+        <strong>Sucesso!</strong> A Ocorrência foi cadastrada ou atualizada
+        com sucesso.
+    </div>
+    <form #cadastro="ngForm" (submit)="salvar()">
+        <div class="form-group">
+            <label for="matricula">Matricula</label><br>
+            <input type="text" id="matricula" name="matricula" class="form-control"
+                   [(ngModel)]="matricula"
+                   required>
+        </div>
+        <div class="form-group">
+            <label for="nome_aluno">Nome</label><br>
+            <input type="text" id="nome_aluno" name="nome_aluno" class="form-control"
+                   [(ngModel)]="nome_aluno"
+                   required>
+        </div>
+        <div class="form-group">
+                <label for="data">Data</label><br>
+                <input type="date" id="data" name="data" class="form-control"
+                       [(ngModel)]="data"
+                       required>
+        </div>           
+        <div class="form-check">
+                <input class = "form-check-imput" name = "paiscompareceram" type="checkbox" value = "A" id="paiscompareceram"
+                       [(ngModel)]="paiscompareceram">
+                <label class="form-check-label" for="paiscompareceram">Os pais compareceram ?</label>
+        </div>
+        <div *ngIf = "paiscompareceram">
+                <label for="nomedoresponsavel">Nome do responsavel</label><br>
+                <input type="text" id="nomedoresponsavel" name="nomedoresponsavel" class="form-control"
+                       [(ngModel)]="nomedoresponsavel">
+        </div>              
+        <div class="form-group">
+            <label for="observacao">observacao</label><br>
+            <textarea id="observacao" name="observacao" class="form-control"
+                      [(ngModel)]="observacao"
+                      cols="70" rows="5"></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="tipo">Tipo de ocorrência</label><br>
+            <select id="tipo" name="tipo" required class="form-control" [(ngModel)]="tipo">
+                <option *ngFor="let t of tipos" [value]="t.id"> {{t.nome}} </option>
+            </select>
+        </div> <br>
+        <div class="text-right">
+            <button type="submit" class="btn btn-primary"
+                    [disabled]="!cadastro.valid">
+                <i class="fa fa-save"></i> Salvar
+            </button>
+            <button type="reset" class="btn btn-secondary" (click)="cancelar()">
+                Cancelar
+            </button>
+        </div>
+    </form>
+</div>
